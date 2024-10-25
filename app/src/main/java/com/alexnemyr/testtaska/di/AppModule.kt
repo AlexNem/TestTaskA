@@ -1,12 +1,14 @@
 package com.alexnemyr.testtaska.di
 
+import android.content.Context
 import com.alexnemyr.testtaska.data.datasource.network.Client
-import com.alexnemyr.testtaska.data.datasource.network.NetworkManager
-import com.alexnemyr.testtaska.data.datasource.network.NetworkManagerImpl
+import com.alexnemyr.testtaska.data.datasource.network.manager.NetworkManager
+import com.alexnemyr.testtaska.data.datasource.network.manager.NetworkManagerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -16,8 +18,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideClient(): Client {
-        return Client()
+    fun provideClient(@ApplicationContext context: Context): Client {
+        return Client(context)
     }
 
 }

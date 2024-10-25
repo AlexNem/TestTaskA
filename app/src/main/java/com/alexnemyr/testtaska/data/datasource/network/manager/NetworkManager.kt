@@ -1,4 +1,4 @@
-package com.alexnemyr.testtaska.data.datasource.network
+package com.alexnemyr.testtaska.data.datasource.network.manager
 
 import kotlinx.coroutines.flow.StateFlow
 

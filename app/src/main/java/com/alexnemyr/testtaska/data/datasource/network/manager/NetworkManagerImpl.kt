@@ -1,4 +1,4 @@
-package com.alexnemyr.testtaska.data.datasource.network
+package com.alexnemyr.testtaska.data.datasource.network.manager
 
 import android.content.Context
 import android.net.ConnectivityManager

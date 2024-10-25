@@ -11,78 +11,42 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.alexnemyr.testtaska.data.datasource.network.APP_TAG
-import com.alexnemyr.testtaska.data.datasource.network.Client
-import com.alexnemyr.testtaska.data.datasource.network.model.UserPoolItem
-import timber.log.Timber
+import androidx.hilt.navigation.compose.hiltViewModel
+
+val horizontalPadding = 16.dp
 
 @Composable
 fun MainScreen(
     paddingValues: PaddingValues,
-
-    ) {
-    //for test
-    val hasInternetConnection = true
-    val userPoolState = remember {
-        mutableStateOf(emptyList<UserPoolItem>())
-    }
-    val filteredPoolState = remember {
-        mutableStateOf(emptyList<UserPoolItem>())
-    }
-    val searchInputState = remember {
-        mutableStateOf("")
-    }
-
-    LaunchedEffect(key1 = true) {
-        val userPool = Client().getUserPool()
-        userPoolState.value = userPool
-        filteredPoolState.value = userPool
-        Timber.tag(APP_TAG).d(
-            "MainScreen -> LaunchedEffect -> " +
-                    "\ngetUserPool = $userPool"
-        )
-
-    }
+    viewModel: MainScreenViewModel = hiltViewModel()
+) {
+    val state = viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .padding(paddingValues)
+            .padding(horizontal = horizontalPadding),
+        horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
     ) {
-        val horizontalPadding = 16.dp
-        if (hasInternetConnection) {
+        if (state.value.hasInternetConnection) {
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = horizontalPadding),
-                value = searchInputState.value,
+                value = state.value.searchInput,
                 onValueChange = {
-                    searchInputState.value = it
-                    Timber.tag(APP_TAG).i("searchInputState = ${searchInputState.value}")
-                    //todo:move to vm
-                    if (searchInputState.value.isNotBlank()) {
-                        filteredPoolState.value = userPoolState.value.filter {
-                            it.login.contains(searchInputState.value)
-                        }
-                    } else {
-                        filteredPoolState.value = userPoolState.value
-                    }
-
+                    viewModel.onSearch(it)
                 })
         }
-        LazyColumn(
-
-        ) {
-            items(filteredPoolState.value) { user ->
+        LazyColumn() {
+            items(state.value.users) { user ->
                 Text(
                     modifier = Modifier
                         .padding(vertical = 16.dp),

@@ -74,6 +74,7 @@ dependencies {
     //DI
     ksp(libs.hilt.android.compiler)
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     //ktor
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
@@ -89,4 +90,5 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     //logging
     implementation(libs.timber)
+    //todo: add leek canary
 }

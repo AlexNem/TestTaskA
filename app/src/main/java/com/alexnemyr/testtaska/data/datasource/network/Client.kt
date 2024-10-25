@@ -1,6 +1,8 @@
 package com.alexnemyr.testtaska.data.datasource.network
 
-import com.alexnemyr.testtaska.data.datasource.network.model.UserPoolItem
+import android.content.Context
+import com.alexnemyr.testtaska.R
+import com.alexnemyr.testtaska.data.datasource.network.model.responce.UserPoolItem
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -17,7 +19,9 @@ import timber.log.Timber
 import javax.inject.Inject
 
 
-class Client @Inject constructor() {
+class Client @Inject constructor(
+    private val context: Context
+) {
     val cioClient = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(Json {
@@ -36,12 +40,21 @@ class Client @Inject constructor() {
     }
 
     suspend fun getUserPool(): List<UserPoolItem> {
-        val result = cioClient.get(BASE_URL + GET_USER_POOL).body<List<UserPoolItem>>()
-        Timber.tag(APP_TAG).d(
-            "Client -> getUserPool -> " +
-                    "\nresult = $result"
-        )
+        val fileContent = context.resources.openRawResource(R.raw.users)
+            .bufferedReader()
+            .use { it.readText() }
+        val result = Json.decodeFromString<List<UserPoolItem>>(fileContent)
         return result
     }
+
+//    suspend fun getUserPool(): List<UserPoolItem> {
+//        //todo: add try catch
+//        val result = cioClient.get(BASE_URL + GET_USER_POOL).body<List<UserPoolItem>>()
+//        Timber.tag(APP_TAG).d(
+//            "Client -> getUserPool -> " +
+//                    "\nresult = $result"
+//        )
+//        return result
+//    }
 
 }

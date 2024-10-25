@@ -1,4 +1,4 @@
-package com.alexnemyr.testtaska.data.datasource.network.model
+package com.alexnemyr.testtaska.data.datasource.network.model.responce
 
 
 import kotlinx.serialization.SerialName
