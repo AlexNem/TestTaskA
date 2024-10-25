@@ -4,7 +4,7 @@ plugins {
     id("com.google.devtools.ksp") version "2.0.21-1.0.25"
     alias(libs.plugins.compose.compiler)
     id("com.google.dagger.hilt.android")
-
+    kotlin("plugin.serialization") version "2.0.21"
 }
 
 android {
@@ -39,6 +39,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     //todo: remove
     composeOptions {
@@ -89,4 +90,6 @@ dependencies {
     //coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
+    //logging
+    implementation(libs.timber)
 }
