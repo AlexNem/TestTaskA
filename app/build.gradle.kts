@@ -1,9 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("com.google.devtools.ksp") version "2.0.21-1.0.25"
+    alias(libs.plugins.ksp)
     alias(libs.plugins.compose.compiler)
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.hilt)
     kotlin("plugin.serialization") version "2.0.21"
 }
 
@@ -43,7 +43,7 @@ android {
     }
     //todo: remove
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
     packaging {
         resources {
@@ -72,11 +72,8 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.ui.test.manifest)
     //DI
-    val hilt = "2.51.1"
-    implementation("com.google.dagger:dagger-compiler:$hilt")
-    ksp("com.google.dagger:dagger-compiler:$hilt")
-    implementation("com.google.dagger:hilt-android:$hilt")
-    ksp("com.google.dagger:hilt-compiler:$hilt")
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.hilt.android)
     //ktor
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
@@ -86,7 +83,7 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
     //serialization //todo: may useless
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation(libs.kotlinx.serialization.json)
     //coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)

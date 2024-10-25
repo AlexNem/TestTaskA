@@ -14,10 +14,11 @@ import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import timber.log.Timber
+import javax.inject.Inject
 
-class Client() {
-    //todo:move to hilt providers
-    private val cioClient = HttpClient(CIO) {
+
+class Client @Inject constructor() {
+    val cioClient = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(Json {
                 prettyPrint = true
