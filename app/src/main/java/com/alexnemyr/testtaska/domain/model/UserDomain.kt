@@ -13,7 +13,7 @@ data class UserDomain(
             get() = UserDomain(
                 id = 0,
                 name = "login",
-                url = "url"
+                url = null
             )
     }
 }
@@ -22,7 +22,7 @@ val UserPoolItem.toDomain: UserDomain
     get() = UserDomain(
         id = this.id,
         name = this.login,
-        url = this.url
+        url = this.avatarUrl
     )
 
 val UserDomain.toDAO: User

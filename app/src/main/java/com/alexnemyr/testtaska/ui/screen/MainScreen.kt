@@ -1,22 +1,31 @@
 package com.alexnemyr.testtaska.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.alexnemyr.testtaska.domain.model.UserDomain
+import com.alexnemyr.testtaska.ui.element.CircleImage
 
 val horizontalPadding = 16.dp
 
@@ -37,12 +46,21 @@ fun MainScreen(
     ) {
         when {
             state.value.showError -> {
-                Text(
+                Box(
                     modifier = Modifier
-                        .padding(vertical = 16.dp),
-                    text = "Search will not work",
-                    fontSize = 24.sp
-                )
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        text = "Search will not work",
+                        fontSize = 36.sp,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
 
             else -> {
@@ -59,22 +77,50 @@ fun Content(
     viewModel: MainScreenViewModel,
     state: MainScreenState
 ) {
-    TextField(
+    Spacer(modifier = Modifier.height(24.dp))
+    OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = horizontalPadding),
         value = state.searchInput,
         onValueChange = {
             viewModel.onSearch(it)
-        })
-    LazyColumn() {
+        },
+        label = { Text(text = "Search your programmer") },
+        singleLine = true,
+        textStyle = TextStyle(
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    )
+    Spacer(modifier = Modifier.height(24.dp))
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(vertical = 16.dp)
+    ) {
         items(state.users) { user ->
-            Text(
-                modifier = Modifier
-                    .padding(vertical = 16.dp),
-                text = user.name,
-                fontSize = 24.sp
-            )
+            User(user = user)
+        }
+    }
+}
+
+@Composable
+fun User(user: UserDomain) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(vertical = 16.dp),
+            text = user.name,
+            fontSize = 36.sp,
+            fontWeight = FontWeight.Bold
+        )
+        user.url?.let {
+            CircleImage(url = it)
         }
     }
 }

@@ -11,4 +11,5 @@ interface UserStorageDataSource {
     fun insertAll(users: List<User>)
 
     fun delete(user: User)
+
 }

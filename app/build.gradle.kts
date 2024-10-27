@@ -97,6 +97,9 @@ dependencies {
     annotationProcessor("androidx.room:room-compiler:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
+    //Coil
+    implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc01")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0-rc01")
 
 //todo: add leek canary
 }
