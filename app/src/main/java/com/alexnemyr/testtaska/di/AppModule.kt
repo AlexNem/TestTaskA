@@ -1,9 +1,13 @@
 package com.alexnemyr.testtaska.di
 
 import android.content.Context
+import com.alexnemyr.testtaska.data.datasource.db.UserStorageDataSource
+import com.alexnemyr.testtaska.data.datasource.db.UserStorageDataSourceImpl
 import com.alexnemyr.testtaska.data.datasource.network.Client
 import com.alexnemyr.testtaska.data.datasource.network.manager.NetworkManager
 import com.alexnemyr.testtaska.data.datasource.network.manager.NetworkManagerImpl
+import com.alexnemyr.testtaska.data.repository.UserRepository
+import com.alexnemyr.testtaska.data.repository.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -32,5 +36,27 @@ abstract class NetworkModule {
     abstract fun bindNetworkManager(
         networkManagerImpl: NetworkManagerImpl
     ): NetworkManager
+
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class DatabaseModule {
+
+    @Binds
+    abstract fun bindUserStorageDataSource(
+        userStorageDataSourceImpl: UserStorageDataSourceImpl
+    ): UserStorageDataSource
+
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepositoryModule {
+
+    @Binds
+    abstract fun bindUserRepository(
+        userRepositoryImpl: UserRepositoryImpl
+    ): UserRepository
 
 }

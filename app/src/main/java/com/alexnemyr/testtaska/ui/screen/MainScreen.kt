@@ -35,26 +35,46 @@ fun MainScreen(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
     ) {
-        if (state.value.hasInternetConnection) {
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = horizontalPadding),
-                value = state.value.searchInput,
-                onValueChange = {
-                    viewModel.onSearch(it)
-                })
-        }
-        LazyColumn() {
-            items(state.value.users) { user ->
+        when {
+            state.value.showError -> {
                 Text(
                     modifier = Modifier
                         .padding(vertical = 16.dp),
-                    text = user.login,
+                    text = "Search will not work",
                     fontSize = 24.sp
                 )
             }
+
+            else -> {
+                Content(viewModel, state.value)
+            }
+
         }
     }
 
+}
+
+@Composable
+fun Content(
+    viewModel: MainScreenViewModel,
+    state: MainScreenState
+) {
+    TextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = horizontalPadding),
+        value = state.searchInput,
+        onValueChange = {
+            viewModel.onSearch(it)
+        })
+    LazyColumn() {
+        items(state.users) { user ->
+            Text(
+                modifier = Modifier
+                    .padding(vertical = 16.dp),
+                text = user.name,
+                fontSize = 24.sp
+            )
+        }
+    }
 }

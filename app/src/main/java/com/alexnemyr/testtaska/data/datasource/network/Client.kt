@@ -44,6 +44,8 @@ class Client @Inject constructor(
             .bufferedReader()
             .use { it.readText() }
         val result = Json.decodeFromString<List<UserPoolItem>>(fileContent)
+        Timber.tag(APP_TAG).d("Client -> getUserPool -> " +
+                "\nresult = $result")
         return result
     }
 

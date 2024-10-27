@@ -3,9 +3,9 @@ package com.alexnemyr.testtaska.ui.screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alexnemyr.testtaska.data.datasource.network.APP_TAG
-import com.alexnemyr.testtaska.data.datasource.network.Client
 import com.alexnemyr.testtaska.data.datasource.network.manager.NetworkManager
-import com.alexnemyr.testtaska.data.datasource.network.model.responce.UserPoolItem
+import com.alexnemyr.testtaska.data.repository.UserRepository
+import com.alexnemyr.testtaska.domain.model.UserDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,18 +17,17 @@ import javax.inject.Inject
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
     private val networkManager: NetworkManager,
-    private val client: Client
+    private val userRepository: UserRepository
 ) : ViewModel() {
-
-    private val name = this.javaClass.simpleName
-
-    private val hasInternetConnection = MutableStateFlow(false)
-    private val userPoolFlow: MutableStateFlow<List<UserPoolItem>> =
-        MutableStateFlow(emptyList())
 
     private val mtbUIState: MutableStateFlow<MainScreenState> =
         MutableStateFlow(MainScreenState.defaultState)
     val uiState: StateFlow<MainScreenState> = mtbUIState.asStateFlow()
+
+    private val hasInternetConnection = MutableStateFlow(false)
+    private val userPoolFlow: MutableStateFlow<List<UserDomain>> =
+        MutableStateFlow(emptyList())
+
 
     init {
         checkInternetConnection()
@@ -38,7 +37,7 @@ class MainScreenViewModel @Inject constructor(
     fun onSearch(value: String) {
         viewModelScope.launch {
             val filteredUsers = userPoolFlow.value
-                .filter { it.login.contains(value) }
+                .filter { it.name.contains(value) }
             mtbUIState.emit(
                 mtbUIState.value.copy(
                     searchInput = value,
@@ -55,39 +54,22 @@ class MainScreenViewModel @Inject constructor(
             isNetworkConnectedFlow.collect {
                 hasInternetConnection.emit(it)
                 mtbUIState.emit(mtbUIState.value.copy(hasInternetConnection = it))
-                Timber.tag(APP_TAG).d(
-                    "$name -> checkInternetConnection -> collect -> " +
-                            "\nisNetworkConnectedFlow = $it"
-                )
+                fetchUserPool()
             }
         }
     }
 
     private fun fetchUserPool() {
         viewModelScope.launch {
-            val userPool = client.getUserPool()
-            Timber.tag(APP_TAG).d(
-                "$name -> fetchUserPool" +
-                        "\nuserPool = $userPool" +
-                        ""
-            )
-            hasInternetConnection.collect {
+            userRepository.fetchUserList(hasInternetConnection.value).collect { userPool ->
                 userPoolFlow.emit(userPool)
-                if (it) {
-                    mtbUIState.emit(mtbUIState.value.copy(users = userPool))
-                    Timber.tag(APP_TAG).d(
-                        "$name -> fetchUserPool" +
-                                "\nuserPool = $userPool" +
-                                ""
-                    )
-                } else {
-                    Timber.tag(APP_TAG).d(
-                        "$name -> fetchUserPool" +
-                                "\nelse -> ${mtbUIState.value.hasInternetConnection}" +
-                                ""
-                    )
-                    //todo: show UI message
-                }
+                mtbUIState.emit(
+                    mtbUIState.value
+                        .copy(
+                            users = userPool,
+                            showError = userPool.isEmpty()
+                        )
+                )
             }
 
         }

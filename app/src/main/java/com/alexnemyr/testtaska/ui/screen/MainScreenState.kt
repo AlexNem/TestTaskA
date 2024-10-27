@@ -1,17 +1,19 @@
 package com.alexnemyr.testtaska.ui.screen
 
-import com.alexnemyr.testtaska.data.datasource.network.model.responce.UserPoolItem
+import com.alexnemyr.testtaska.domain.model.UserDomain
 
 data class MainScreenState(
-    val users: List<UserPoolItem>,
+    val users: List<UserDomain>,
     val searchInput: String,
     val hasInternetConnection: Boolean,
+    val showError: Boolean
 ) {
     companion object {
         val defaultState = MainScreenState(
             users = emptyList(),
             searchInput = "",
-            hasInternetConnection = false
+            hasInternetConnection = false,
+            showError = false
         )
     }
 }
