@@ -51,11 +51,12 @@ fun MainScreen(
                         .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
+                    val errorText = state.value.errorMessage ?: "Search will not work"
                     Text(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 16.dp),
-                        text = "Search will not work",
+                        text = errorText,
                         fontSize = 36.sp,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold

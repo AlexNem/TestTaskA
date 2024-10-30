@@ -3,11 +3,11 @@ package com.alexnemyr.testtaska.data.repository
 import com.alexnemyr.testtaska.data.datasource.db.UserStorageDataSource
 import com.alexnemyr.testtaska.data.datasource.db.toDomain
 import com.alexnemyr.testtaska.data.datasource.network.APP_TAG
-import com.alexnemyr.testtaska.data.datasource.network.Client
+import com.alexnemyr.testtaska.data.datasource.network.UserApi
+import com.alexnemyr.testtaska.data.datasource.network.handler.Result
 import com.alexnemyr.testtaska.domain.model.UserDomain
-import com.alexnemyr.testtaska.domain.model.toDAO
 import com.alexnemyr.testtaska.domain.model.toDomain
-import kotlinx.coroutines.CoroutineScope
+import com.alexnemyr.testtaska.domain.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -18,26 +18,32 @@ import javax.inject.Singleton
 
 @Singleton
 class UserRepositoryImpl @Inject constructor(
-    private val client: Client,
+    private val userApi: UserApi,
     private val userStorageDataSource: UserStorageDataSource
 ) : UserRepository {
 
-    private val scope = CoroutineScope(Dispatchers.IO)
-
-    override suspend fun fetchUserList(isConnected: Boolean): Flow<List<UserDomain>> {
+    override suspend fun fetchUserList(isConnected: Boolean): Flow<Result<List<UserDomain>>> {
         return flow {
             if (isConnected) {
                 emit(getRemoteUserList())
             } else {
-                emit(getCashedUserList())
+                emit(
+                    Result.Success(getCashedUserList())
+                )
             }
         }
     }
 
-    private suspend fun getRemoteUserList(): List<UserDomain> = withContext(Dispatchers.IO) {
-        val result = client.getUserPool().map { it.toDomain }
-        userStorageDataSource.insertAll(result.map { it.toDAO })
-        result
+    private suspend fun getRemoteUserList(): Result<List<UserDomain>> = withContext(Dispatchers.IO) {
+        when (val result = userApi.getUserPoolResult()) {
+            is Result.Success -> {
+                Result.Success(data = result.data.map { it.toDomain })
+            }
+
+            is Result.Error -> {
+                Result.Error(message = "error")
+            }
+        }
     }
 
     private suspend fun getCashedUserList(): List<UserDomain> = withContext(Dispatchers.IO) {

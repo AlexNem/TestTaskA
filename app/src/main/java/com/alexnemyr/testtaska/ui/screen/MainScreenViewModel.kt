@@ -2,16 +2,15 @@ package com.alexnemyr.testtaska.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alexnemyr.testtaska.data.datasource.network.APP_TAG
+import com.alexnemyr.testtaska.data.datasource.network.handler.Result
 import com.alexnemyr.testtaska.data.datasource.network.manager.NetworkManager
-import com.alexnemyr.testtaska.data.repository.UserRepository
+import com.alexnemyr.testtaska.domain.repository.UserRepository
 import com.alexnemyr.testtaska.domain.model.UserDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,7 +30,6 @@ class MainScreenViewModel @Inject constructor(
 
     init {
         checkInternetConnection()
-        fetchUserPool()
     }
 
     fun onSearch(value: String) {
@@ -62,14 +60,29 @@ class MainScreenViewModel @Inject constructor(
     private fun fetchUserPool() {
         viewModelScope.launch {
             userRepository.fetchUserList(hasInternetConnection.value).collect { userPool ->
-                userPoolFlow.emit(userPool)
-                mtbUIState.emit(
-                    mtbUIState.value
-                        .copy(
-                            users = userPool,
-                            showError = userPool.isEmpty()
+                when (userPool) {
+                    is Result.Success -> {
+                        userPoolFlow.emit(userPool.data)
+                        mtbUIState.emit(
+                            mtbUIState.value
+                                .copy(
+                                    users = userPool.data,
+                                    showError = userPool.data.isEmpty()
+                                )
                         )
-                )
+                    }
+
+                    is Result.Error -> {
+                        mtbUIState.emit(
+                            mtbUIState.value
+                                .copy(
+                                    showError = true,
+                                    errorMessage = userPool.message
+                                )
+                        )
+                    }
+                }
+
             }
 
         }
