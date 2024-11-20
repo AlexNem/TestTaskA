@@ -3,19 +3,27 @@ package com.alexnemyr.testtaska.data.datasource.db
 import android.content.Context
 import androidx.room.Room
 import dagger.hilt.android.qualifiers.ApplicationContext
+import net.sqlcipher.database.SQLiteDatabase
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class UserStorageDataSourceImpl @Inject constructor(
     @ApplicationContext context: Context
-): UserStorageDataSource {
+) : UserStorageDataSource {
 
+    //todo:for test move to Keystore
+    private val dbPassword = "your_secure_password"
+
+    private val passphrase: ByteArray = SQLiteDatabase.getBytes(dbPassword.toCharArray())
+    private val factory = SQLCipherHelperFactory(passphrase)
     private val db: AppDatabase = Room.databaseBuilder(
         context = context,
         AppDatabase::class.java,
         USER_DB_NAME
-    ).build()
+    )
+        .openHelperFactory(factory)
+        .build()
 
 
     override fun getAll(): List<User> =
