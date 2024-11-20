@@ -110,9 +110,9 @@ class NetworkManagerImpl @Inject constructor(
 
     private fun provideDefaultCurrentNetwork(): CurrentNetwork {
         return CurrentNetwork(
-            isListening = false,
+            isListening = true,
             networkCapabilities = null,
-            isAvailable = false,
+            isAvailable = true,
             isBlocked = false
         )
     }
@@ -127,8 +127,9 @@ class NetworkManagerImpl @Inject constructor(
     private fun CurrentNetwork.isConnected(): Boolean {
         return isListening &&
                 isAvailable &&
-                !isBlocked &&
-                networkCapabilities.isNetworkCapabilitiesValid()
+                !isBlocked
+//                &&
+//                networkCapabilities.isNetworkCapabilitiesValid()
     }
 
     private fun NetworkCapabilities?.isNetworkCapabilitiesValid(): Boolean = when {

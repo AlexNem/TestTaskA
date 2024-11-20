@@ -13,7 +13,7 @@ data class MainScreenState(
         val defaultState = MainScreenState(
             users = emptyList(),
             searchInput = "",
-            hasInternetConnection = false,
+            hasInternetConnection = true,
             showError = false,
             errorMessage = null
         )

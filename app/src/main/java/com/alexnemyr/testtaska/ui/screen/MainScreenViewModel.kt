@@ -2,6 +2,7 @@ package com.alexnemyr.testtaska.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.alexnemyr.testtaska.data.datasource.network.APP_TAG
 import com.alexnemyr.testtaska.data.datasource.network.handler.Result
 import com.alexnemyr.testtaska.data.datasource.network.manager.NetworkManager
 import com.alexnemyr.testtaska.domain.repository.UserRepository
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,7 +25,7 @@ class MainScreenViewModel @Inject constructor(
         MutableStateFlow(MainScreenState.defaultState)
     val uiState: StateFlow<MainScreenState> = mtbUIState.asStateFlow()
 
-    private val hasInternetConnection = MutableStateFlow(false)
+    private val hasInternetConnection = MutableStateFlow(true)
     private val userPoolFlow: MutableStateFlow<List<UserDomain>> =
         MutableStateFlow(emptyList())
 
@@ -50,6 +52,7 @@ class MainScreenViewModel @Inject constructor(
             networkManager.startListenNetworkState()
             val isNetworkConnectedFlow = networkManager.isNetworkConnectedFlow
             isNetworkConnectedFlow.collect {
+                Timber.tag(APP_TAG).d("checkInternetConnection -> $it")
                 hasInternetConnection.emit(it)
                 mtbUIState.emit(mtbUIState.value.copy(hasInternetConnection = it))
                 fetchUserPool()

@@ -22,14 +22,12 @@ class UserRepositoryImpl @Inject constructor(
     private val userStorageDataSource: UserStorageDataSource
 ) : UserRepository {
 
-    override suspend fun fetchUserList(isConnected: Boolean): Flow<Result<List<UserDomain>>> {
+    override fun fetchUserList(isConnected: Boolean): Flow<Result<List<UserDomain>>> {
         return flow {
             if (isConnected) {
                 emit(getRemoteUserList())
             } else {
-                emit(
-                    Result.Success(getCashedUserList())
-                )
+                emit(Result.Success(getCashedUserList()))
             }
         }
     }
