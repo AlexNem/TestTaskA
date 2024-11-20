@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.alexnemyr.testtaska"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.alexnemyr.testtaska"
