@@ -55,24 +55,24 @@ fun Content(
     viewModel: MainScreenViewModel,
     state: MainScreenState
 ) {
-    Spacer(modifier = Modifier.height(24.dp))
-    val searchLabel = if (state.showError) "Search will not work" else "Search your programmer"
-    OutlinedTextField(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = horizontalPadding),
-        value = state.searchInput,
-        onValueChange = {
-            viewModel.onSearch(it)
-        },
-        enabled = !state.showError,
-        label = { Text(text = searchLabel) },
-        singleLine = true,
-        textStyle = TextStyle(
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-    )
+//    Spacer(modifier = Modifier.height(24.dp))
+//    val searchLabel = if (state.showError) "Search will not work" else "Search your programmer"
+//    OutlinedTextField(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = horizontalPadding),
+//        value = state.searchInput,
+//        onValueChange = {
+//            viewModel.onSearch(it)
+//        },
+//        enabled = !state.showError,
+//        label = { Text(text = searchLabel) },
+//        singleLine = true,
+//        textStyle = TextStyle(
+//            fontSize = 18.sp,
+//            fontWeight = FontWeight.SemiBold
+//        )
+//    )
     Spacer(modifier = Modifier.height(24.dp))
     val quantityLabel = "Quantity"
     OutlinedTextField(
