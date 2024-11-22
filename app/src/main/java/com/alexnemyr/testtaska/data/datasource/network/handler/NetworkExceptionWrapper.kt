@@ -5,6 +5,7 @@ import io.ktor.client.statement.HttpResponse
 
 sealed interface Result<out T: Any> {
     data class Success<out T: Any>(val data: T) : Result<T>
+    data class SuccessWithMessage<out T: Any>(val data: T, val message: MessageType) : Result<T>
     data class Error<out T: Any>(val message: String?) : Result<T>
 }
 
@@ -17,6 +18,10 @@ suspend inline fun <reified T: Any> HttpResponse.toResult(): Result<T> {
         504 -> Result.Error(NetworkException("Too much load at this time, try again later!").message)
         else -> Result.Error(NetworkException("Something went wrong! Please try again or contact support.").message)
     }
+}
+
+sealed class MessageType {
+    object NO_INTERNET_CONNECTION: MessageType()
 }
 
 class NetworkException(message: String) : Exception(message)

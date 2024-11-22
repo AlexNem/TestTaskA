@@ -1,7 +1,6 @@
 package com.alexnemyr.testtaska.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -20,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,31 +42,7 @@ fun MainScreen(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
     ) {
-        when {
-            state.value.showError -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    val errorText = state.value.errorMessage ?: "Search will not work"
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp),
-                        text = errorText,
-                        fontSize = 36.sp,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-            else -> {
-                Content(viewModel, state.value)
-            }
-
-        }
+        Content(viewModel, state.value)
     }
 
 }
@@ -79,6 +53,7 @@ fun Content(
     state: MainScreenState
 ) {
     Spacer(modifier = Modifier.height(24.dp))
+    val label = if (state.showError) "Search will not work" else "Search your programmer"
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
@@ -87,7 +62,8 @@ fun Content(
         onValueChange = {
             viewModel.onSearch(it)
         },
-        label = { Text(text = "Search your programmer") },
+        enabled = !state.showError,
+        label = { Text(text = label) },
         singleLine = true,
         textStyle = TextStyle(
             fontSize = 18.sp,

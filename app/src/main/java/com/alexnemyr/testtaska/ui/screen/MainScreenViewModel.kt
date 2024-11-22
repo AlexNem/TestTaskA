@@ -2,22 +2,20 @@ package com.alexnemyr.testtaska.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alexnemyr.testtaska.data.datasource.network.APP_TAG
+import com.alexnemyr.testtaska.data.datasource.network.handler.MessageType
 import com.alexnemyr.testtaska.data.datasource.network.handler.Result
-import com.alexnemyr.testtaska.data.datasource.network.manager.NetworkManager
-import com.alexnemyr.testtaska.domain.repository.UserRepository
 import com.alexnemyr.testtaska.domain.model.UserDomain
+import com.alexnemyr.testtaska.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val networkManager: NetworkManager,
     private val userRepository: UserRepository
 ) : ViewModel() {
 
@@ -25,13 +23,11 @@ class MainScreenViewModel @Inject constructor(
         MutableStateFlow(MainScreenState.defaultState)
     val uiState: StateFlow<MainScreenState> = mtbUIState.asStateFlow()
 
-    private val hasInternetConnection = MutableStateFlow(true)
     private val userPoolFlow: MutableStateFlow<List<UserDomain>> =
         MutableStateFlow(emptyList())
 
-
     init {
-        checkInternetConnection()
+        fetchUserPool()
     }
 
     fun onSearch(value: String) {
@@ -39,7 +35,7 @@ class MainScreenViewModel @Inject constructor(
             val filteredUsers = userPoolFlow.value
                 .filter { it.name.contains(value) }
             mtbUIState.emit(
-                mtbUIState.value.copy(
+                mtbUIState.value.update(
                     searchInput = value,
                     users = filteredUsers
                 )
@@ -47,30 +43,28 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
-    private fun checkInternetConnection() {
-        viewModelScope.launch {
-            networkManager.startListenNetworkState()
-            val isNetworkConnectedFlow = networkManager.isNetworkConnectedFlow
-            isNetworkConnectedFlow.collect {
-                Timber.tag(APP_TAG).d("checkInternetConnection -> $it")
-                hasInternetConnection.emit(it)
-                mtbUIState.emit(mtbUIState.value.copy(hasInternetConnection = it))
-                fetchUserPool()
-            }
-        }
-    }
-
     private fun fetchUserPool() {
-        viewModelScope.launch {
-            userRepository.fetchUserList(hasInternetConnection.value).collect { userPool ->
+        viewModelScope.launch(Dispatchers.IO) {
+            userRepository.fetchUserList().collect { userPool ->
                 when (userPool) {
                     is Result.Success -> {
                         userPoolFlow.emit(userPool.data)
                         mtbUIState.emit(
                             mtbUIState.value
-                                .copy(
+                                .update(
                                     users = userPool.data,
                                     showError = userPool.data.isEmpty()
+                                )
+                        )
+                    }
+
+                    is Result.SuccessWithMessage -> {
+                        userPoolFlow.emit(userPool.data)
+                        mtbUIState.emit(
+                            mtbUIState.value
+                                .update(
+                                    users = userPool.data,
+                                    showError = userPool.message == MessageType.NO_INTERNET_CONNECTION
                                 )
                         )
                     }
@@ -78,7 +72,7 @@ class MainScreenViewModel @Inject constructor(
                     is Result.Error -> {
                         mtbUIState.emit(
                             mtbUIState.value
-                                .copy(
+                                .update(
                                     showError = true,
                                     errorMessage = userPool.message
                                 )

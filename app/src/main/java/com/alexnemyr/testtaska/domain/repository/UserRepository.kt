@@ -5,5 +5,5 @@ import com.alexnemyr.testtaska.domain.model.UserDomain
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
-    fun fetchUserList(isConnected: Boolean): Flow<Result<List<UserDomain>>>
+    fun fetchUserList(): Flow<Result<List<UserDomain>>>
 }
