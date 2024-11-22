@@ -7,6 +7,7 @@ import timber.log.Timber
 data class MainScreenState(
     val users: List<UserDomain>,
     val searchInput: String,
+    val quantityInput: String,
     val showError: Boolean,
     val errorMessage: String?
 ) {
@@ -15,6 +16,7 @@ data class MainScreenState(
         val defaultState = MainScreenState(
             users = emptyList(),
             searchInput = "",
+            quantityInput = "",
             showError = false,
             errorMessage = null
         )
@@ -24,12 +26,14 @@ data class MainScreenState(
 fun MainScreenState.update(
     users: List<UserDomain>? = null,
     searchInput: String? = null,
+    quantityInput: String? = null,
     showError: Boolean? = null,
     errorMessage: String? = null
 ): MainScreenState {
     val newState = MainScreenState(
         users ?: this.users,
         searchInput?: this.searchInput,
+        quantityInput?: this.quantityInput,
         showError?: this.showError,
         errorMessage?: this.errorMessage
     )

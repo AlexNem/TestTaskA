@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,8 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.alexnemyr.testtaska.domain.model.UserDomain
 import com.alexnemyr.testtaska.ui.element.CircleImage
@@ -53,7 +56,7 @@ fun Content(
     state: MainScreenState
 ) {
     Spacer(modifier = Modifier.height(24.dp))
-    val label = if (state.showError) "Search will not work" else "Search your programmer"
+    val searchLabel = if (state.showError) "Search will not work" else "Search your programmer"
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
@@ -63,7 +66,28 @@ fun Content(
             viewModel.onSearch(it)
         },
         enabled = !state.showError,
-        label = { Text(text = label) },
+        label = { Text(text = searchLabel) },
+        singleLine = true,
+        textStyle = TextStyle(
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    )
+    Spacer(modifier = Modifier.height(24.dp))
+    val quantityLabel = "Quantity"
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = horizontalPadding),
+        value = state.quantityInput,
+        onValueChange = {
+            if (it.isDigitsOnly()) {
+                viewModel.onQuantity(it)
+            }
+        },
+        placeholder = { Text("MAX item count 30") },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        label = { Text(text = quantityLabel) },
         singleLine = true,
         textStyle = TextStyle(
             fontSize = 18.sp,

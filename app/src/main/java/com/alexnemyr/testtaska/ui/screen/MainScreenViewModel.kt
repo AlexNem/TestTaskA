@@ -2,6 +2,7 @@ package com.alexnemyr.testtaska.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.alexnemyr.testtaska.data.datasource.network.APP_TAG
 import com.alexnemyr.testtaska.data.datasource.network.handler.MessageType
 import com.alexnemyr.testtaska.data.datasource.network.handler.Result
 import com.alexnemyr.testtaska.domain.model.UserDomain
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,6 +42,32 @@ class MainScreenViewModel @Inject constructor(
                     users = filteredUsers
                 )
             )
+        }
+    }
+
+    fun onQuantity(value: String) {
+        viewModelScope.launch {
+            Timber.tag(APP_TAG).e("onQuantity userPoolFlow.value.size = ${userPoolFlow.value.size}")
+            if (value.isNotBlank()) {
+                if (value.toInt() <= userPoolFlow.value.size) {
+                    val filteredUsers = userPoolFlow.value
+                        .slice(0..<value.toInt())
+                    mtbUIState.emit(
+                        mtbUIState.value.update(
+                            quantityInput = value,
+                            users = filteredUsers
+                        )
+                    )
+                }
+            } else {
+                mtbUIState.emit(
+                    mtbUIState.value.update(
+                        quantityInput = "",
+                        users = userPoolFlow.value
+                    )
+                )
+            }
+
         }
     }
 
